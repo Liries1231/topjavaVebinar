@@ -1,5 +1,8 @@
 package ru.javawebinar.topjava.util;
 
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.stream.Collectors;
 import ru.javawebinar.topjava.model.UserMeal;
 import ru.javawebinar.topjava.model.UserMealWithExcess;
 
@@ -22,10 +25,10 @@ public class UserMealsUtil {
         );
 
 
-        List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
-        mealsTo.forEach(System.out::println);
+  //      List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+    //    mealsTo.forEach(System.out::println);
 
-//        System.out.println(filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
+       System.out.println(filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -35,6 +38,12 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         // TODO Implement by streams
-        return null;
+        Map<LocalDate, Integer> maps = meals.stream().collect(Collectors.groupingBy(UserMeal::getDate,
+            Collectors.summingInt(UserMeal::getCalories)));
+
+        return meals.stream().filter(s -> TimeUtil.isBetweenHalfOpen(s.getDateTime().toLocalTime(),startTime,endTime))
+            .map(s-> new UserMealWithExcess(s.getDateTime(),s.getDescription(),s.getCalories(),
+                maps.get(s.getDate())
+                >caloriesPerDay)).collect(Collectors.toList());
     }
 }
