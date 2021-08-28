@@ -45,5 +45,6 @@ public class UserMealsUtil {
             .map(s-> new UserMealWithExcess(s.getDateTime(),s.getDescription(),s.getCalories(),
                 maps.get(s.getDate())
                 >caloriesPerDay)).collect(Collectors.toList());
+
     }
 }
